@@ -19,7 +19,9 @@ export const handler = async (transaction: Transaction) => {
 
     // Return data + decision for the Step Function "Choice" state
     return {
-        ...transaction,
+        sender: transaction.sender,
+        amount: transaction.amount.toString(),
+        currency: transaction.currency,
         status,
         checkedAt: new Date().toISOString()
     };

@@ -60,7 +60,7 @@ export class ServerlessComplianceFlowStack extends cdk.Stack {
         Key: sfn.JsonPath.stringAt('$.sender'), // Use sender name as filename
         Body: sfn.JsonPath.stringAt('$'), // Save full JSON
       },
-      iamResources: [bucket.bucketArn],
+      iamResources: [bucket.arnForObjects('*')], // Grants access to "bucket-name/*"
     });
 
     // 4. Orchestration Logic
@@ -74,6 +74,7 @@ export class ServerlessComplianceFlowStack extends cdk.Stack {
 
     const stateMachine = new sfn.StateMachine(this, 'StateMachine', {
       definitionBody: sfn.DefinitionBody.fromChainable(definition),
+      stateMachineType: sfn.StateMachineType.EXPRESS,
     });
 
     // 5. API Gateway (Trigger)

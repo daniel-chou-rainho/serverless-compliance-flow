@@ -1,7 +1,16 @@
 export const handler = async (event: any) => {
-    // In Step Functions, 'event' is often the payload passed from the previous state
-    const { sender, amount, currency } = event;
+    // 1. Extract the input string
+    const rawInput = event.body?.input || event.input;
 
+    if (!rawInput) {
+        throw new Error(`Critical: Could not find input field. Received: ${JSON.stringify(event)}`);
+    }
+
+    // 2. Parse the stringified JSON into a real object
+    const data = typeof rawInput === 'string' ? JSON.parse(rawInput) : rawInput;
+    const { sender, amount, currency } = data;
+
+    // 3. Validate
     if (!sender || !amount || !currency) {
         throw new Error("Invalid Payload: Missing sender, amount, or currency.");
     }
@@ -10,6 +19,6 @@ export const handler = async (event: any) => {
         throw new Error("Invalid Payload: Amount must be a number.");
     }
 
-    // Pass the valid data to the next step
+    // 4. Return clean data
     return { sender, amount, currency };
 };
